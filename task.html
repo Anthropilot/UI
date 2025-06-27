@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anthropilot Task</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 2.2rem 1.5rem 2rem 1.5rem;
+      max-width: 420px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .task-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #3B82F6;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    .task-instructions {
+      font-size: 1.05rem;
+      color: #374151;
+      margin-bottom: 1.2rem;
+      text-align: center;
+    }
+    .image-area {
+      position: relative;
+      width: 320px;
+      height: 180px;
+      background: #f3f4f6;
+      border-radius: 16px;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+    }
+    .cookie-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      filter: brightness(0.98);
+    }
+    .label {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      background: #fff;
+      border-radius: 50%;
+      border: 2.5px solid #3B82F6;
+      color: #3B82F6;
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
+    }
+    .label-a { left: 18px; top: 18px; }
+    .label-b { right: 18px; top: 18px; }
+    .label-c { left: 18px; bottom: 18px; }
+    .label-d { right: 18px; bottom: 18px; }
+    .timer-bar {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 6px;
+      margin-bottom: 1.2rem;
+      overflow: hidden;
+    }
+    .timer-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #10B981 60%, #F59E42 100%);
+      width: 100%;
+      transition: width 0.2s linear, background 0.2s;
+    }
+    .timer-text {
+      font-size: 1.05rem;
+      color: #F59E42;
+      font-weight: 600;
+      margin-bottom: 1.1rem;
+      text-align: center;
+    }
+    .choices {
+      display: flex;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+      width: 100%;
+      justify-content: center;
+    }
+    .choice-btn {
+      flex: 1 1 0;
+      padding: 1rem 0;
+      border-radius: 12px;
+      border: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3B82F6;
+      background: #fff;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      outline: none;
+      border: 2px solid transparent;
+    }
+    .choice-btn:hover:not(:disabled) {
+      background: #e0f2fe;
+      color: #10B981;
+      box-shadow: 0 4px 16px 0 rgba(16,185,129,0.10);
+      border: 2px solid #10B981;
+    }
+    .choice-btn.selected {
+      background: #10B981;
+      color: #fff;
+      border: 2px solid #10B981;
+      box-shadow: 0 4px 16px 0 rgba(16,185,129,0.18);
+    }
+    .choice-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .confirmation {
+      font-size: 1.1rem;
+      color: #10B981;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      animation: fadeIn 0.5s;
+    }
+    .timeout {
+      font-size: 1.1rem;
+      color: #F43F5E;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 500px) {
+      .container {
+        max-width: 99vw;
+        padding: 1.2rem 0.2rem 1.2rem 0.2rem;
+      }
+      .image-area {
+        width: 98vw;
+        height: 54vw;
+        min-height: 120px;
+      }
+      .choices {
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="task-title">Bakery Robot: Identify Chocolate Cookie</div>
+    <div class="task-instructions">Select which cookie is chocolate by clicking the correct label below.</div>
+    <div class="image-area">
+      <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Cookies" class="cookie-img" />
+      <div class="label label-a">A</div>
+      <div class="label label-b">B</div>
+      <div class="label label-c">C</div>
+      <div class="label label-d">D</div>
+    </div>
+    <div class="timer-bar"><div class="timer-progress" id="timerProgress"></div></div>
+    <div class="timer-text" id="timerText">10 seconds left</div>
+    <div class="choices">
+      <button class="choice-btn" id="btnA">A</button>
+      <button class="choice-btn" id="btnB">B</button>
+      <button class="choice-btn" id="btnC">C</button>
+      <button class="choice-btn" id="btnD">D</button>
+    </div>
+    <div class="confirmation" id="confirmation" style="display:none;">Thank you! Your answer has been submitted.</div>
+    <div class="timeout" id="timeout" style="display:none;">Time's up! Task not completed.</div>
+  </div>
+  <script>
+    const totalTime = 10; // seconds
+    let timeLeft = totalTime;
+    let timerInterval = null;
+    let answered = false;
+    const timerText = document.getElementById('timerText');
+    const timerProgress = document.getElementById('timerProgress');
+    const confirmation = document.getElementById('confirmation');
+    const timeoutMsg = document.getElementById('timeout');
+    const btns = [
+      document.getElementById('btnA'),
+      document.getElementById('btnB'),
+      document.getElementById('btnC'),
+      document.getElementById('btnD')
+    ];
+    function updateTimer() {
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerText.textContent = "0 seconds left";
+        timerProgress.style.width = '0%';
+        timerProgress.style.background = '#F43F5E';
+        btns.forEach(btn => btn.disabled = true);
+        timeoutMsg.style.display = 'block';
+        return;
+      }
+      timerText.textContent = `${timeLeft} second${timeLeft === 1 ? '' : 's'} left`;
+      timerProgress.style.width = `${(timeLeft/totalTime)*100}%`;
+      if (timeLeft <= 3) {
+        timerProgress.style.background = '#F43F5E';
+        timerText.style.color = '#F43F5E';
+      } else if (timeLeft <= 5) {
+        timerProgress.style.background = '#F59E42';
+        timerText.style.color = '#F59E42';
+      } else {
+        timerProgress.style.background = 'linear-gradient(90deg, #10B981 60%, #F59E42 100%)';
+        timerText.style.color = '#F59E42';
+      }
+      timeLeft--;
+    }
+    function handleChoice(idx) {
+      if (answered) return;
+      answered = true;
+      clearInterval(timerInterval);
+      btns.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === idx) {
+          btn.classList.add('selected');
+        }
+      });
+      confirmation.style.display = 'block';
+      timerText.style.display = 'none';
+      timerProgress.style.background = '#10B981';
+      timerProgress.style.width = '100%';
+    }
+    btns.forEach((btn, idx) => {
+      btn.addEventListener('click', () => handleChoice(idx));
+    });
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html> 
