@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Interface - Anthropilot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .task-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .task-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3B82F6;
+    }
+    .tier-badge {
+      background: linear-gradient(90deg, #10B981 60%, #3B82F6 100%);
+      color: #fff;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .timer-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .timer-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #F59E42;
+    }
+    .timer-bar {
+      width: 100px;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .timer-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #10B981 60%, #F59E42 100%);
+      transition: width 0.2s linear, background 0.2s;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .task-container {
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .task-description {
+      text-align: center;
+      color: #374151;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    .task-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .image-area {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: 250px;
+      background: #f3f4f6;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px 0 rgba(59,130,246,0.08);
+    }
+    .task-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+    .label {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      border: 3px solid #3B82F6;
+      color: #3B82F6;
+      font-weight: 700;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.15);
+    }
+    .label-a { left: 20px; top: 20px; }
+    .label-b { right: 20px; top: 20px; }
+    .label-c { left: 20px; bottom: 20px; }
+    .label-d { right: 20px; bottom: 20px; }
+    .choices {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      justify-content: center;
+    }
+    .choice-btn {
+      flex: 1;
+      max-width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      border: none;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3B82F6;
+      background: #fff;
+      box-shadow: 0 4px 16px 0 rgba(59,130,246,0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+      outline: none;
+      border: 2px solid transparent;
+    }
+    .choice-btn:hover:not(:disabled) {
+      background: #e0f2fe;
+      color: #10B981;
+      box-shadow: 0 6px 20px 0 rgba(16,185,129,0.15);
+      border: 2px solid #10B981;
+      transform: translateY(-2px);
+    }
+    .choice-btn.selected {
+      background: #10B981;
+      color: #fff;
+      border: 2px solid #10B981;
+      box-shadow: 0 6px 20px 0 rgba(16,185,129,0.25);
+    }
+    .choice-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .tier2-content, .tier3-content {
+      width: 100%;
+      display: none;
+    }
+    .upload-area {
+      width: 100%;
+      height: 150px;
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: #6B7280;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .upload-area:hover {
+      border-color: #3B82F6;
+      color: #3B82F6;
+    }
+    .control-panel {
+      width: 100%;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #e5e7eb;
+    }
+    .control-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .control-btn {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #374151;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .control-btn:hover {
+      background: #3B82F6;
+      color: #fff;
+      border-color: #3B82F6;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    .btn {
+      flex: 1;
+      padding: 1rem;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #3B82F6 60%, #10B981 100%);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(90deg, #2563eb 60%, #059669 100%);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .confirmation {
+      font-size: 1.1rem;
+      color: #10B981;
+      font-weight: 600;
+      text-align: center;
+      animation: fadeIn 0.5s;
+    }
+    .timeout {
+      font-size: 1.1rem;
+      color: #F43F5E;
+      font-weight: 600;
+      text-align: center;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .bottom-nav {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.8rem 0;
+      position: sticky;
+      bottom: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: #6B7280;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-item.active {
+      color: #3B82F6;
+    }
+    .nav-item:hover {
+      color: #3B82F6;
+    }
+    .nav-icon {
+      font-size: 1.2rem;
+    }
+    @media (max-width: 600px) {
+      .main-content {
+        padding: 1rem 0.5rem;
+      }
+      .task-container {
+        padding: 1.5rem 1rem;
+      }
+      .choices {
+        gap: 0.5rem;
+      }
+      .choice-btn {
+        max-width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="task-info">
+      <div class="task-title" id="taskTitle">Bakery Robot: Identify Chocolate Cookie</div>
+      <div class="tier-badge" id="tierBadge">Tier 1</div>
+    </div>
+    <div class="timer-container">
+      <div class="timer-text" id="timerText">10s</div>
+      <div class="timer-bar">
+        <div class="timer-progress" id="timerProgress"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="task-container">
+      <div class="task-description" id="taskDescription">
+        Select which cookie is chocolate by clicking the correct label below.
+      </div>
+      
+      <div class="task-content">
+        <!-- Tier 1 Content -->
+        <div id="tier1Content">
+          <div class="image-area">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Task Image" class="task-image" />
+            <div class="label label-a">A</div>
+            <div class="label label-b">B</div>
+            <div class="label label-c">C</div>
+            <div class="label label-d">D</div>
+          </div>
+          <div class="choices">
+            <button class="choice-btn" id="btnA">A</button>
+            <button class="choice-btn" id="btnB">B</button>
+            <button class="choice-btn" id="btnC">C</button>
+            <button class="choice-btn" id="btnD">D</button>
+          </div>
+        </div>
+
+        <!-- Tier 2 Content -->
+        <div class="tier2-content" id="tier2Content">
+          <div class="upload-area">
+            <div style="font-size: 2rem;">📷</div>
+            <div>Upload image or video feedback</div>
+            <div style="font-size: 0.8rem;">Click to upload or drag and drop</div>
+          </div>
+        </div>
+
+        <!-- Tier 3 Content -->
+        <div class="tier3-content" id="tier3Content">
+          <div class="control-panel">
+            <div class="control-row">
+              <button class="control-btn">Forward</button>
+              <button class="control-btn">Backward</button>
+            </div>
+            <div class="control-row">
+              <button class="control-btn">Left</button>
+              <button class="control-btn">Right</button>
+            </div>
+            <div class="control-row">
+              <button class="control-btn">Grip</button>
+              <button class="control-btn">Release</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation" id="confirmation" style="display:none;">Thank you! Your answer has been submitted.</div>
+      <div class="timeout" id="timeout" style="display:none;">Time's up! Task not completed.</div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="submitBtn" onclick="submitTask()">Submit</button>
+        <button class="btn btn-secondary" onclick="cancelTask()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="#" class="nav-item">
+      <div class="nav-icon">🏠</div>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item active">
+      <div class="nav-icon">📋</div>
+      <span>Task</span>
+    </a>
+    <a href="#" class="nav-item">
+      <div class="nav-icon">📊</div>
+      <span>History</span>
+    </a>
+    <a href="#" class="nav-item">
+      <div class="nav-icon">👤</div>
+      <span>Profile</span>
+    </a>
+  </div>
+
+  <script>
+    // Get task ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('id');
+
+    // Task data
+    const taskData = {
+      1: {
+        title: "Bakery Robot: Identify Chocolate Cookie",
+        tier: "Tier 1",
+        description: "Select which cookie is chocolate by clicking the correct label below."
+      },
+      2: {
+        title: "Warehouse Robot: Confirm Package Pickup",
+        tier: "Tier 1",
+        description: "Confirm if the package pickup was successful."
+      },
+      3: {
+        title: "Hospital Robot: Navigate Obstacle",
+        tier: "Tier 2",
+        description: "Upload image or video feedback of the obstacle navigation."
+      }
+    };
+
+    let timeLeft = 10;
+    let timerInterval = null;
+    let answered = false;
+    let currentTier = "Tier 1";
+
+    function loadTaskData() {
+      const task = taskData[taskId] || taskData[1];
+      currentTier = task.tier;
+      
+      document.getElementById('taskTitle').textContent = task.title;
+      document.getElementById('tierBadge').textContent = task.tier;
+      document.getElementById('taskDescription').textContent = task.description;
+      
+      // Show appropriate tier content
+      document.getElementById('tier1Content').style.display = currentTier === 'Tier 1' ? 'block' : 'none';
+      document.getElementById('tier2Content').style.display = currentTier === 'Tier 2' ? 'block' : 'none';
+      document.getElementById('tier3Content').style.display = currentTier === 'Tier 3' ? 'block' : 'none';
+    }
+
+    function updateTimer() {
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timerText').textContent = "0s";
+        document.getElementById('timerProgress').style.width = '0%';
+        document.getElementById('timerProgress').style.background = '#F43F5E';
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('timeout').style.display = 'block';
+        return;
+      }
+      
+      document.getElementById('timerText').textContent = timeLeft + 's';
+      document.getElementById('timerProgress').style.width = (timeLeft/10)*100 + '%';
+      
+      if (timeLeft <= 3) {
+        document.getElementById('timerProgress').style.background = '#F43F5E';
+        document.getElementById('timerText').style.color = '#F43F5E';
+      } else if (timeLeft <= 5) {
+        document.getElementById('timerProgress').style.background = '#F59E42';
+        document.getElementById('timerText').style.color = '#F59E42';
+      }
+      
+      timeLeft--;
+    }
+
+    function handleChoice(idx) {
+      if (answered) return;
+      answered = true;
+      
+      const btns = ['btnA', 'btnB', 'btnC', 'btnD'];
+      btns.forEach((btn, i) => {
+        const button = document.getElementById(btn);
+        button.disabled = true;
+        if (i === idx) {
+          button.classList.add('selected');
+        }
+      });
+      
+      document.getElementById('confirmation').style.display = 'block';
+      document.getElementById('timerText').style.display = 'none';
+      document.getElementById('timerProgress').style.background = '#10B981';
+      document.getElementById('timerProgress').style.width = '100%';
+    }
+
+    function submitTask() {
+      alert('Task submitted successfully!');
+      // Redirect to dashboard or history
+    }
+
+    function cancelTask() {
+      if (confirm('Are you sure you want to cancel this task?')) {
+        history.back();
+      }
+    }
+
+    // Initialize
+    loadTaskData();
+    
+    if (currentTier === 'Tier 1') {
+      ['btnA', 'btnB', 'btnC', 'btnD'].forEach((btn, idx) => {
+        document.getElementById(btn).addEventListener('click', () => handleChoice(idx));
+      });
+    }
+    
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html> 
