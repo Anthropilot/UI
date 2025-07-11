@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worker Dashboard - Anthropilot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #3B82F6;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .user-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: url('https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f464.png') no-repeat center/cover;
+      border: 2px solid #3B82F6;
+    }
+    .user-info {
+      text-align: right;
+    }
+    .user-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #111827;
+    }
+    .user-tier {
+      font-size: 0.8rem;
+      color: #10B981;
+      font-weight: 500;
+    }
+    .main-content {
+      flex: 1;
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+    }
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .analytics-card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+      padding: 1.5rem;
+      text-align: center;
+      border-left: 4px solid #3B82F6;
+    }
+    .analytics-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #3B82F6;
+      margin-bottom: 0.5rem;
+    }
+    .analytics-label {
+      font-size: 0.9rem;
+      color: #6B7280;
+      font-weight: 500;
+    }
+    .analytics-trend {
+      font-size: 0.8rem;
+      color: #10B981;
+      margin-top: 0.5rem;
+    }
+    .filters {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #374151;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: #3B82F6;
+      color: #fff;
+      border-color: #3B82F6;
+    }
+    .filter-btn:hover {
+      border-color: #3B82F6;
+    }
+    .task-history {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .task-entry {
+      background: rgba(255,255,255,0.8);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+      padding: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid #3B82F6;
+      transition: all 0.2s;
+    }
+    .task-entry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px 0 rgba(59,130,246,0.12);
+    }
+    .task-entry.success { border-left-color: #10B981; }
+    .task-entry.timeout { border-left-color: #F43F5E; }
+    .task-entry.pending { border-left-color: #F59E42; }
+    .task-info {
+      flex: 1;
+    }
+    .task-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #3B82F6;
+      margin-bottom: 0.3rem;
+    }
+    .task-meta {
+      font-size: 0.9rem;
+      color: #6B7280;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .task-status {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .task-status.success {
+      background: #e0f7ef;
+      color: #10B981;
+    }
+    .task-status.timeout {
+      background: #fde8e8;
+      color: #F43F5E;
+    }
+    .task-status.pending {
+      background: #fff7ed;
+      color: #F59E42;
+    }
+    .task-rating {
+      color: #F59E42;
+      font-size: 1.1rem;
+    }
+    .skill-modules {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .skill-card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+      padding: 1.5rem;
+      border-left: 4px solid #10B981;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .skill-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px 0 rgba(16,185,129,0.15);
+    }
+    .skill-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #10B981;
+      margin-bottom: 0.5rem;
+    }
+    .skill-description {
+      font-size: 0.9rem;
+      color: #6B7280;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .skill-progress {
+      margin-bottom: 1rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10B981 60%, #3B82F6 100%);
+      transition: width 0.3s;
+    }
+    .skill-btn {
+      background: linear-gradient(90deg, #10B981 60%, #3B82F6 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .skill-btn:hover {
+      background: linear-gradient(90deg, #059669 60%, #2563eb 100%);
+    }
+    .bottom-nav {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.8rem 0;
+      position: sticky;
+      bottom: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: #6B7280;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-item.active {
+      color: #3B82F6;
+    }
+    .nav-item:hover {
+      color: #3B82F6;
+    }
+    .nav-icon {
+      font-size: 1.2rem;
+    }
+    @media (max-width: 600px) {
+      .main-content {
+        padding: 1rem 0.5rem;
+      }
+      .header {
+        padding: 0.8rem 1rem;
+      }
+      .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .filters {
+        gap: 0.5rem;
+      }
+      .filter-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f916.png" alt="Anthropilot" width="28" height="28" />
+      Anthropilot
+    </div>
+    <div class="user-summary">
+      <div class="user-info">
+        <div class="user-name">Pradeep</div>
+        <div class="user-tier">Tier 1</div>
+      </div>
+      <div class="user-avatar"></div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="section-title">
+      📊 Performance Analytics
+    </div>
+    
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <div class="analytics-value" id="totalTasks">24</div>
+        <div class="analytics-label">Total Tasks</div>
+        <div class="analytics-trend">+12% this week</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-value" id="successRate">92%</div>
+        <div class="analytics-label">Success Rate</div>
+        <div class="analytics-trend">+3% this week</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-value" id="avgTime">4.2s</div>
+        <div class="analytics-label">Avg Response Time</div>
+        <div class="analytics-trend">-0.8s this week</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-value" id="rating">4.8★</div>
+        <div class="analytics-label">Average Rating</div>
+        <div class="analytics-trend">+0.2 this week</div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      📋 Task History
+    </div>
+    
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="success">Success</button>
+      <button class="filter-btn" data-filter="timeout">Timeout</button>
+      <button class="filter-btn" data-filter="pending">Pending</button>
+    </div>
+
+    <div class="task-history" id="taskHistory">
+      <!-- Task entries will be injected here -->
+    </div>
+
+    <div class="section-title">
+      🎯 Skill Development
+    </div>
+    
+    <div class="skill-modules">
+      <div class="skill-card">
+        <div class="skill-title">Object Recognition</div>
+        <div class="skill-description">Improve your ability to identify objects in various conditions and lighting.</div>
+        <div class="skill-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 75%"></div>
+          </div>
+        </div>
+        <button class="skill-btn">Continue Learning</button>
+      </div>
+      <div class="skill-card">
+        <div class="skill-title">Spatial Navigation</div>
+        <div class="skill-description">Learn to help robots navigate complex environments and avoid obstacles.</div>
+        <div class="skill-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 45%"></div>
+          </div>
+        </div>
+        <button class="skill-btn">Start Module</button>
+      </div>
+      <div class="skill-card">
+        <div class="skill-title">Robotic Control</div>
+        <div class="skill-description">Master advanced robotic manipulation and control techniques.</div>
+        <div class="skill-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 20%"></div>
+          </div>
+        </div>
+        <button class="skill-btn">Unlock Module</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="#" class="nav-item">
+      <div class="nav-icon">🏠</div>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item">
+      <div class="nav-icon">📋</div>
+      <span>Task</span>
+    </a>
+    <a href="#" class="nav-item active">
+      <div class="nav-icon">📊</div>
+      <span>History</span>
+    </a>
+    <a href="#" class="nav-item">
+      <div class="nav-icon">👤</div>
+      <span>Profile</span>
+    </a>
+  </div>
+
+  <script>
+    const taskHistory = [
+      {
+        title: "Bakery Robot: Identify Chocolate Cookie",
+        date: "2024-06-01 14:22",
+        status: "success",
+        response: "B",
+        rating: 5,
+        time: 4
+      },
+      {
+        title: "Warehouse Robot: Confirm Package Pickup",
+        date: "2024-06-01 13:50",
+        status: "timeout",
+        response: "-",
+        rating: 0,
+        time: 11
+      },
+      {
+        title: "Bakery Robot: Identify Chocolate Cookie",
+        date: "2024-05-31 17:10",
+        status: "success",
+        response: "C",
+        rating: 4,
+        time: 6
+      },
+      {
+        title: "Hospital Robot: Navigate Obstacle",
+        date: "2024-05-31 16:45",
+        status: "pending",
+        response: "-",
+        rating: 0,
+        time: 0
+      }
+    ];
+
+    function renderTaskHistory(filter = 'all') {
+      const history = document.getElementById('taskHistory');
+      history.innerHTML = '';
+      
+      const filteredTasks = taskHistory.filter(task => {
+        if (filter === 'all') return true;
+        return task.status === filter;
+      });
+
+      filteredTasks.forEach(task => {
+        const entry = document.createElement('div');
+        entry.className = `task-entry ${task.status}`;
+        
+        entry.innerHTML = `
+          <div class="task-info">
+            <div class="task-title">${task.title}</div>
+            <div class="task-meta">
+              <span>${task.date}</span>
+              <span>Response: ${task.response}</span>
+              <span>Time: ${task.time}s</span>
+            </div>
+          </div>
+          <div class="task-status ${task.status}">
+            ${task.status === 'success' ? '✔' : task.status === 'timeout' ? '⏰' : '⏳'}
+            ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+          </div>
+          <div class="task-rating">${task.rating > 0 ? '★'.repeat(task.rating) : ''}</div>
+        `;
+        
+        history.appendChild(entry);
+      });
+    }
+
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderTaskHistory(this.dataset.filter);
+      });
+    });
+
+    // Initial render
+    renderTaskHistory();
+  </script>
+</body>
+</html> 

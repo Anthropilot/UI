@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anthropilot Task History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      color: #111827;
+    }
+    .navbar {
+      width: 100%;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3B82F6;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: url('https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f464.png') no-repeat center/cover;
+      border: 2px solid #3B82F6;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-link {
+      color: #374151;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.05rem;
+      transition: color 0.2s;
+    }
+    .nav-link:hover {
+      color: #3B82F6;
+    }
+    .main {
+      max-width: 900px;
+      margin: 2.5rem auto 0 auto;
+      padding: 0 1rem;
+    }
+    .header {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #3B82F6;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .summary {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .summary-card {
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+      padding: 1.2rem 1.5rem;
+      min-width: 160px;
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .summary-title {
+      font-size: 1rem;
+      color: #6B7280;
+      font-weight: 500;
+    }
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #10B981;
+    }
+    .summary-value.red { color: #F43F5E; }
+    .summary-value.orange { color: #F59E42; }
+    .summary-value.blue { color: #3B82F6; }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-label {
+      font-size: 1rem;
+      color: #374151;
+      font-weight: 500;
+    }
+    .filter-select {
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 1rem;
+      background: #fff;
+      color: #374151;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .filter-select:focus {
+      border: 1.5px solid #3B82F6;
+    }
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .task-entry {
+      background: rgba(255,255,255,0.7);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+      padding: 1.1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+      border-left: 6px solid #3B82F6;
+      transition: border-color 0.2s;
+    }
+    .task-entry.success { border-left-color: #10B981; }
+    .task-entry.timeout { border-left-color: #F43F5E; }
+    .task-entry.pending { border-left-color: #F59E42; }
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .task-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3B82F6;
+    }
+    .task-date {
+      font-size: 0.98rem;
+      color: #6B7280;
+    }
+    .task-status {
+      font-size: 0.98rem;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 0.1rem 0.7rem;
+      margin-left: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .task-status.success {
+      color: #10B981;
+      background: #e0f7ef;
+    }
+    .task-status.timeout {
+      color: #F43F5E;
+      background: #fde8e8;
+    }
+    .task-status.pending {
+      color: #F59E42;
+      background: #fff7ed;
+    }
+    .task-feedback {
+      font-size: 1rem;
+      color: #374151;
+      margin-top: 0.2rem;
+    }
+    .task-rating {
+      color: #F59E42;
+      font-size: 1.2rem;
+      margin-left: 0.3rem;
+    }
+    @media (max-width: 700px) {
+      .main {
+        padding: 0 0.2rem;
+      }
+      .navbar {
+        flex-direction: column;
+        gap: 0.7rem;
+        padding: 0.7rem 0.5rem;
+      }
+      .summary {
+        flex-direction: column;
+        gap: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f916.png" alt="Anthropilot" width="32" height="32" />
+      Anthropilot
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="#" class="nav-link">Support</a>
+      <div class="avatar"></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="header">Task History & Feedback</div>
+    <div class="summary">
+      <div class="summary-card">
+        <div class="summary-title">Total Tasks</div>
+        <div class="summary-value blue" id="totalTasks">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Success Rate</div>
+        <div class="summary-value" id="successRate">0%</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Avg. Response Time</div>
+        <div class="summary-value orange" id="avgTime">0s</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Rating</div>
+        <div class="summary-value" id="avgRating">0.0 ★</div>
+      </div>
+    </div>
+    <div class="filters">
+      <span class="filter-label">Filter by Status:</span>
+      <select class="filter-select" id="statusFilter">
+        <option value="all">All</option>
+        <option value="success">Success</option>
+        <option value="timeout">Timeout</option>
+        <option value="pending">Pending</option>
+      </select>
+      <span class="filter-label">Sort by:</span>
+      <select class="filter-select" id="sortFilter">
+        <option value="date">Date</option>
+        <option value="rating">Rating</option>
+        <option value="time">Response Time</option>
+      </select>
+    </div>
+    <div class="task-list" id="taskList">
+      <!-- Task entries will be injected here -->
+    </div>
+  </div>
+  <script>
+    // Example task history data
+    const tasks = [
+      {
+        title: "Bakery Robot: Identify Chocolate Cookie",
+        date: "2024-06-01 14:22",
+        status: "success",
+        response: "B",
+        feedback: "Great job! Quick and accurate.",
+        rating: 5,
+        time: 4
+      },
+      {
+        title: "Warehouse Robot: Confirm Package Pickup",
+        date: "2024-06-01 13:50",
+        status: "timeout",
+        response: "-",
+        feedback: "No response in time.",
+        rating: 0,
+        time: 11
+      },
+      {
+        title: "Bakery Robot: Identify Chocolate Cookie",
+        date: "2024-05-31 17:10",
+        status: "success",
+        response: "C",
+        feedback: "Correct selection.",
+        rating: 4,
+        time: 6
+      },
+      {
+        title: "Warehouse Robot: Confirm Package Pickup",
+        date: "2024-05-31 16:45",
+        status: "pending",
+        response: "-",
+        feedback: "Awaiting review.",
+        rating: 0,
+        time: 0
+      }
+    ];
+    function renderTasks(filter = 'all', sort = 'date') {
+      let filtered = tasks.filter(t => filter === 'all' ? true : t.status === filter);
+      if (sort === 'rating') {
+        filtered = filtered.slice().sort((a, b) => b.rating - a.rating);
+      } else if (sort === 'time') {
+        filtered = filtered.slice().sort((a, b) => a.time - b.time);
+      } else {
+        filtered = filtered.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      filtered.forEach(task => {
+        const entry = document.createElement('div');
+        entry.className = `task-entry ${task.status}`;
+        entry.innerHTML = `
+          <div class="task-row">
+            <div class="task-title">${task.title}</div>
+            <div class="task-date">${task.date}</div>
+            <div class="task-status ${task.status}">
+              ${task.status === 'success' ? '✔' : task.status === 'timeout' ? '⏰' : '⏳'}
+              ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+            </div>
+          </div>
+          <div class="task-row">
+            <span>Response: <strong>${task.response}</strong></span>
+            <span class="task-rating">${task.rating > 0 ? '★'.repeat(task.rating) : ''}</span>
+          </div>
+          <div class="task-feedback">${task.feedback}</div>
+          <div class="task-row"><span>Response Time: ${task.time}s</span></div>
+        `;
+        list.appendChild(entry);
+      });
+    }
+    function updateSummary() {
+      const total = tasks.length;
+      const successes = tasks.filter(t => t.status === 'success').length;
+      const avgTime = (tasks.filter(t => t.time > 0).reduce((a, b) => a + b.time, 0) / (tasks.filter(t => t.time > 0).length || 1)).toFixed(1);
+      const avgRating = (tasks.filter(t => t.rating > 0).reduce((a, b) => a + b.rating, 0) / (tasks.filter(t => t.rating > 0).length || 1)).toFixed(1);
+      document.getElementById('totalTasks').textContent = total;
+      document.getElementById('successRate').textContent = total ? Math.round((successes/total)*100) + '%' : '0%';
+      document.getElementById('avgTime').textContent = avgTime + 's';
+      document.getElementById('avgRating').textContent = avgRating + ' ★';
+    }
+    document.getElementById('statusFilter').addEventListener('change', function() {
+      renderTasks(this.value, document.getElementById('sortFilter').value);
+    });
+    document.getElementById('sortFilter').addEventListener('change', function() {
+      renderTasks(document.getElementById('statusFilter').value, this.value);
+    });
+    updateSummary();
+    renderTasks();
+  </script>
+</body>
+</html> 

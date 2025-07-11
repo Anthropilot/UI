@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Description - Anthropilot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6B7280;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .back-btn:hover {
+      background: #f3f4f6;
+      color: #3B82F6;
+    }
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+    .main-content {
+      flex: 1;
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+    }
+    .task-card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .task-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #3B82F6;
+      flex: 1;
+    }
+    .task-badge {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .tier-badge {
+      background: linear-gradient(90deg, #10B981 60%, #3B82F6 100%);
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .urgent-badge {
+      background: #F43F5E;
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .task-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .meta-item {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 12px;
+      border-left: 4px solid #3B82F6;
+    }
+    .meta-label {
+      font-size: 0.9rem;
+      color: #6B7280;
+      margin-bottom: 0.3rem;
+    }
+    .meta-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+    .task-description {
+      margin-bottom: 2rem;
+    }
+    .description-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.8rem;
+    }
+    .description-text {
+      font-size: 1rem;
+      color: #6B7280;
+      line-height: 1.6;
+    }
+    .requirements {
+      margin-bottom: 2rem;
+    }
+    .requirements-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.8rem;
+    }
+    .requirements-list {
+      list-style: none;
+      padding: 0;
+    }
+    .requirements-list li {
+      padding: 0.5rem 0;
+      color: #6B7280;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .requirements-list li::before {
+      content: "✓";
+      color: #10B981;
+      font-weight: bold;
+    }
+    .task-image {
+      width: 100%;
+      height: 200px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6B7280;
+      font-size: 1rem;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex: 1;
+      min-width: 120px;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #3B82F6 60%, #10B981 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px 0 rgba(59,130,246,0.15);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(90deg, #2563eb 60%, #059669 100%);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    .bottom-nav {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.8rem 0;
+      position: sticky;
+      bottom: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: #6B7280;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-item.active {
+      color: #3B82F6;
+    }
+    .nav-item:hover {
+      color: #3B82F6;
+    }
+    .nav-icon {
+      font-size: 1.2rem;
+    }
+    @media (max-width: 600px) {
+      .main-content {
+        padding: 1rem 0.5rem;
+      }
+      .task-card {
+        padding: 1.5rem;
+      }
+      .task-meta {
+        grid-template-columns: 1fr;
+      }
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <div class="header-title">Task Details</div>
+  </div>
+
+  <div class="main-content">
+    <div class="task-card">
+      <div class="task-header">
+        <div class="task-title" id="taskTitle">Bakery Robot: Identify Chocolate Cookie</div>
+        <div class="task-badge">
+          <div class="tier-badge" id="taskTier">Tier 1</div>
+          <div class="urgent-badge" id="urgentBadge" style="display:none;">Urgent</div>
+        </div>
+      </div>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <div class="meta-label">Time Remaining</div>
+          <div class="meta-value" id="timeRemaining">5 minutes</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Estimated Pay</div>
+          <div class="meta-value" id="estimatedPay">$0.50 - $1.00</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Difficulty</div>
+          <div class="meta-value" id="difficulty">Easy</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Success Rate</div>
+          <div class="meta-value" id="successRate">95%</div>
+        </div>
+      </div>
+
+      <div class="task-image">
+        📷 Task Preview Image
+      </div>
+
+      <div class="task-description">
+        <div class="description-title">Task Description</div>
+        <div class="description-text" id="taskDescription">
+          A bakery robot needs help identifying which cookie is chocolate from a tray of four different cookies. 
+          The robot's AI system has low confidence in its object recognition and requires human assistance to 
+          make the correct selection. You will be shown a labeled image with options A, B, C, and D, and you 
+          need to select the chocolate cookie.
+        </div>
+      </div>
+
+      <div class="requirements">
+        <div class="requirements-title">Requirements</div>
+        <ul class="requirements-list">
+          <li>Basic visual recognition skills</li>
+          <li>Stable internet connection</li>
+          <li>Ability to respond within time limit</li>
+          <li>No prior experience needed</li>
+        </ul>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="acceptTask()">Accept Task</button>
+        <button class="btn btn-secondary" onclick="history.back()">Back to Tasks</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="#" class="nav-item">
+      <div class="nav-icon">🏠</div>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item active">
+      <div class="nav-icon">📋</div>
+      <span>Task</span>
+    </a>
+    <a href="#" class="nav-item">
+      <div class="nav-icon">📊</div>
+      <span>History</span>
+    </a>
+    <a href="#" class="nav-item">
+      <div class="nav-icon">👤</div>
+      <span>Profile</span>
+    </a>
+  </div>
+
+  <script>
+    // Get task ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('id');
+
+    // Task data (in real app, this would come from API)
+    const taskData = {
+      1: {
+        title: "Bakery Robot: Identify Chocolate Cookie",
+        tier: "Tier 1",
+        urgent: true,
+        timeRemaining: "2 minutes",
+        estimatedPay: "$0.50 - $1.00",
+        difficulty: "Easy",
+        successRate: "95%",
+        description: "A bakery robot needs help identifying which cookie is chocolate from a tray of four different cookies. The robot's AI system has low confidence in its object recognition and requires human assistance to make the correct selection. You will be shown a labeled image with options A, B, C, and D, and you need to select the chocolate cookie."
+      },
+      2: {
+        title: "Warehouse Robot: Confirm Package Pickup",
+        tier: "Tier 1",
+        urgent: false,
+        timeRemaining: "5 minutes",
+        estimatedPay: "$0.75 - $1.25",
+        difficulty: "Easy",
+        successRate: "92%",
+        description: "A warehouse robot needs confirmation that it has picked up the correct package from the designated location. You will be shown the robot's current view and asked to confirm if the package pickup was successful."
+      },
+      3: {
+        title: "Hospital Robot: Navigate Obstacle",
+        tier: "Tier 2",
+        urgent: false,
+        timeRemaining: "10 minutes",
+        estimatedPay: "$2.00 - $3.50",
+        difficulty: "Medium",
+        successRate: "88%",
+        description: "A hospital robot needs assistance navigating around an unexpected obstacle in its path. You will need to analyze the situation and provide guidance on the best route to take."
+      }
+    };
+
+    function loadTaskData() {
+      const task = taskData[taskId] || taskData[1];
+      
+      document.getElementById('taskTitle').textContent = task.title;
+      document.getElementById('taskTier').textContent = task.tier;
+      document.getElementById('timeRemaining').textContent = task.timeRemaining;
+      document.getElementById('estimatedPay').textContent = task.estimatedPay;
+      document.getElementById('difficulty').textContent = task.difficulty;
+      document.getElementById('successRate').textContent = task.successRate;
+      document.getElementById('taskDescription').textContent = task.description;
+      
+      if (task.urgent) {
+        document.getElementById('urgentBadge').style.display = 'block';
+      }
+    }
+
+    function acceptTask() {
+      alert(`Task accepted! Redirecting to task interface...`);
+      // In real app, this would redirect to task_interface.html with task ID
+      window.location.href = 'task_interface.html?id=' + taskId;
+    }
+
+    // Load task data on page load
+    loadTaskData();
+  </script>
+</body>
+</html> 

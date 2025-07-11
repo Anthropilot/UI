@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anthropilot Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e0e7ef 100%);
+      min-height: 100vh;
+      color: #111827;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      justify-items: center;
+    }
+    .page-preview {
+      background: rgba(255,255,255,0.7);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+      padding: 1rem 1rem 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 400px;
+      max-width: 98vw;
+    }
+    .page-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3B82F6;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.01em;
+    }
+    iframe {
+      width: 360px;
+      height: 540px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+    }
+    .diagram {
+      margin: 2rem auto 0 auto;
+      max-width: 700px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px 0 rgba(16,185,129,0.06);
+      padding: 1.5rem 1rem;
+    }
+    .diagram-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #10B981;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+      .page-preview {
+        width: 98vw;
+        padding: 0.5rem 0.2rem 1.2rem 0.2rem;
+      }
+      iframe {
+        width: 96vw;
+        height: 60vw;
+        min-height: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center; color:#3B82F6; margin-top:1.5rem; font-size:2rem;">Anthropilot Prototype Preview</h1>
+  <div class="grid">
+    <div class="page-preview">
+      <div class="page-label">Login / Onboarding</div>
+      <iframe src="login.html" title="Login Page Preview"></iframe>
+    </div>
+    <div class="page-preview">
+      <div class="page-label">Dashboard</div>
+      <iframe src="dashboard.html" title="Dashboard Page Preview"></iframe>
+    </div>
+    <div class="page-preview">
+      <div class="page-label">Task Interface</div>
+      <iframe src="task.html" title="Task Page Preview"></iframe>
+    </div>
+    <div class="page-preview">
+      <div class="page-label">Task History & Feedback</div>
+      <iframe src="history.html" title="History Page Preview"></iframe>
+    </div>
+  </div>
+  <div class="diagram">
+    <div class="diagram-title">User Flow Diagram</div>
+    <svg width="100%" height="140" viewBox="0 0 900 140">
+      <g font-family="Inter, sans-serif" font-size="18" text-anchor="middle">
+        <rect x="30" y="40" width="160" height="50" rx="12" fill="#3B82F6" fill-opacity="0.12" />
+        <text x="110" y="70" fill="#3B82F6">Login</text>
+        <rect x="250" y="40" width="160" height="50" rx="12" fill="#10B981" fill-opacity="0.12" />
+        <text x="330" y="70" fill="#10B981">Dashboard</text>
+        <rect x="470" y="40" width="160" height="50" rx="12" fill="#F59E42" fill-opacity="0.12" />
+        <text x="550" y="70" fill="#F59E42">Task Interface</text>
+        <rect x="690" y="40" width="160" height="50" rx="12" fill="#6366F1" fill-opacity="0.12" />
+        <text x="770" y="70" fill="#6366F1">Task History</text>
+        <polygon points="190,65 250,65 250,75 190,75" fill="#3B82F6" />
+        <polygon points="410,65 470,65 470,75 410,75" fill="#10B981" />
+        <polygon points="630,65 690,65 690,75 630,75" fill="#F59E42" />
+        <text x="220" y="110" fill="#6B7280" font-size="14">Sign In</text>
+        <text x="440" y="110" fill="#6B7280" font-size="14">Accept Task</text>
+        <text x="660" y="110" fill="#6B7280" font-size="14">View History</text>
+      </g>
+    </svg>
+    <div style="text-align:center;color:#6B7280;font-size:1rem;margin-top:0.5rem;">Arrows indicate main user navigation flow</div>
+  </div>
+  <div style="text-align:center;margin:2rem 0 1rem 0;color:#374151;font-size:1.1rem;">
+    <strong>Available files:</strong> preview.html, login.html, dashboard.html, task.html, history.html<br/>
+    Open <span style="color:#3B82F6;">preview.html</span> for a holistic view. Interact directly within each frame.
+  </div>
+</body>
+</html> 
